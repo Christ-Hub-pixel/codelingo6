@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "320792142437",
+    "project_id": "codelingo-94540",
+    "storage_bucket": "codelingo-94540.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:320792142437:android:b07f9e4c91669287515c8c",
+        "android_client_info": {
+          "package_name": "com.example.codelingo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWOR4xbjaTuvlBH0s9bE3FIsrb9C-Uel4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

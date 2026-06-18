@@ -1,0 +1,334 @@
+{
+  "langue": "Python",
+  "unites": [
+    {
+      "id": "u1",
+      "titre": "Unité 1 : L'Éveil du Codeur",
+      "description": "Les bases fondamentales de Python",
+      "lecons": [
+        {
+          "id": "py_intro",
+          "titre": "Syntaxe Python",
+          "theorie": "La syntaxe de Python est très simple. Pour afficher du texte, on utilise la fonction `print()`. Contrairement à d'autres langages, Python utilise l'indentation pour définir les blocs de code.",
+          "ordre": 1,
+          "exemples": [
+            "print(\"Hello, World!\")",
+            "if 5 > 2:\n  print(\"Cinq est plus grand que deux!\")"
+          ],
+          "exercices": [
+            {
+              "id": "ex_syntaxe_1",
+              "instruction": "Complétez le code pour afficher 'Bonjour'",
+              "codeAvant": "print(",
+              "codeApres": ")",
+              "options": ["\"Bonjour\"", "Bonjour", "print"],
+              "reponseCorrecte": "\"Bonjour\"",
+              "explication": "Les chaînes de caractères (Strings) doivent être entre guillemets.",
+              "indice": "Utilise des guillemets doubles ou simples !",
+              "points": 10
+            }
+          ]
+        },
+        {
+          "id": "py_vars",
+          "titre": "Variables",
+          "theorie": "En Python, les variables sont créées au moment où vous leur assignez une valeur. Contrairement à d'autres langages, vous n'avez pas besoin de déclarer le type.",
+          "ordre": 2,
+          "exemples": [
+            "x = 5\ny = \"John\"\nprint(x)\nprint(y)"
+          ],
+          "exercices": [
+            {
+              "id": "ex_vars_1",
+              "instruction": "Créez une variable 'age' et assignez-lui la valeur 25",
+              "codeAvant": "age = ",
+              "codeApres": "",
+              "options": ["25", "\"25\"", "age"],
+              "reponseCorrecte": "25",
+              "explication": "Pour un nombre entier, on n'utilise pas de guillemets.",
+              "indice": "C'est un nombre entier (integer).",
+              "points": 15
+            }
+          ]
+        },
+        {
+          "id": "py_types",
+          "titre": "Types de Données",
+          "theorie": "En Python, chaque variable a un type. Les plus courants sont int (entier), str (chaîne de texte), float (nombre décimal) et bool (vrai ou faux).",
+          "ordre": 3,
+          "exemples": [
+            "age = 25 # int\nnom = \"Alice\" # str\nprix = 19.99 # float\nest_vrai = True # bool"
+          ],
+          "exercices": [
+            {
+              "id": "ex_types_1",
+              "instruction": "Quel est le type de la valeur \"hello\" ?",
+              "codeAvant": "type(\"hello\") == ",
+              "codeApres": "",
+              "options": ["str", "int", "float"],
+              "reponseCorrecte": "str",
+              "explication": "Le texte entre guillemets est toujours une chaîne de caractères (string).",
+              "indice": "C'est une chaîne de caractères en anglais.",
+              "points": 15
+            }
+          ]
+        },
+        {
+          "id": "py_maths",
+          "titre": "Opérateurs",
+          "theorie": "Python sait faire des mathématiques ! Vous pouvez utiliser +, -, * (multiplication) et / (division).",
+          "ordre": 4,
+          "exemples": [
+            "a = 10\nb = 5\nprint(a + b) # 15\nprint(a * b) # 50"
+          ],
+          "exercices": [
+            {
+              "id": "ex_maths_1",
+              "instruction": "Complétez l'opération pour obtenir 20",
+              "codeAvant": "resultat = 5 ",
+              "codeApres": " 4",
+              "options": ["*", "+", "/"],
+              "reponseCorrecte": "*",
+              "explication": "5 multiplié par 4 donne 20.",
+              "indice": "C'est une multiplication.",
+              "points": 15
+            }
+          ]
+        },
+        {
+          "id": "py_input",
+          "titre": "Entrées Utilisateur",
+          "theorie": "Pour demander une information à l'utilisateur, on utilise la fonction input(). Elle renvoie toujours du texte.",
+          "ordre": 5,
+          "exemples": [
+            "nom = input(\"Quel est ton nom ? \")\nprint(\"Bonjour \" + nom)"
+          ],
+          "exercices": [
+            {
+              "id": "ex_input_1",
+              "instruction": "Demandez à l'utilisateur son âge",
+              "codeAvant": "age = ",
+              "codeApres": "(\"Ton âge ?\")",
+              "options": ["input", "print", "get"],
+              "reponseCorrecte": "input",
+              "explication": "input() met le programme en pause et attend une saisie clavier.",
+              "indice": "Ça veut dire 'entrée' en anglais.",
+              "points": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u2",
+      "titre": "Unité 2 : Logique & Conditions",
+      "description": "Prendre des décisions avec le code",
+      "lecons": [
+        {
+          "id": "py_if",
+          "titre": "Si / Sinon (If/Else)",
+          "theorie": "L'instruction `if` permet d'exécuter du code seulement si une condition est vraie. L'instruction `else` capture tout ce qui n'est pas capturé par les conditions précédentes.",
+          "ordre": 6,
+          "exemples": [
+            "a = 33\nb = 200\nif b > a:\n  print(\"b est plus grand\")\nelse:\n  print(\"a est plus grand\")"
+          ],
+          "exercices": [
+            {
+              "id": "ex_if_1",
+              "instruction": "Vérifiez si a est égal à b",
+              "codeAvant": "if a ",
+              "codeApres": " b:",
+              "options": ["==", "=", "is"],
+              "reponseCorrecte": "==",
+              "explication": "En Python, on utilise == pour comparer et = pour assigner une valeur.",
+              "indice": "Il faut deux signes égal pour la comparaison !",
+              "points": 20
+            }
+          ]
+        },
+        {
+          "id": "py_elif",
+          "titre": "Elif (Sinon Si)",
+          "theorie": "Le mot-clé `elif` est la manière de Python de dire : 'Si les conditions précédentes n'étaient pas vraies, alors essayez celle-ci'.",
+          "ordre": 7,
+          "exemples": [
+            "a = 33\nb = 33\nif b > a:\n  print(\"b > a\")\nelif a == b:\n  print(\"a et b sont égaux\")"
+          ],
+          "exercices": [
+            {
+              "id": "ex_elif_1",
+              "instruction": "Ajoutez la condition manquante",
+              "codeAvant": "if a > b:\n  print(1)\n",
+              "codeApres": " a == b:\n  print(2)",
+              "options": ["elif", "else if", "else"],
+              "reponseCorrecte": "elif",
+              "explication": "elif est la contraction de 'else if' en Python.",
+              "indice": "C'est un mélange de 'else' et 'if'.",
+              "points": 20
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u3",
+      "titre": "Unité 3 : Listes et Itérations",
+      "description": "Manipuler des collections de données",
+      "lecons": [
+        {
+          "id": "py_lists",
+          "titre": "Les Listes",
+          "theorie": "Les listes sont utilisées pour stocker plusieurs éléments dans une seule variable. Les éléments sont ordonnés et modifiables.",
+          "ordre": 8,
+          "exemples": [
+            "fruits = [\"pomme\", \"banane\", \"cerise\"]\nprint(fruits[0]) # Affiche pomme"
+          ],
+          "exercices": [
+            {
+              "id": "ex_list_1",
+              "instruction": "Accédez au premier élément de la liste",
+              "codeAvant": "print(fruits",
+              "codeApres": ")",
+              "options": ["[0]", "[1]", "(0)"],
+              "reponseCorrecte": "[0]",
+              "explication": "L'indexation en Python commence à 0.",
+              "indice": "Le premier élément est à l'index zéro.",
+              "points": 25
+            }
+          ]
+        },
+        {
+          "id": "py_for",
+          "titre": "Boucles For",
+          "theorie": "Une boucle `for` est utilisée pour itérer sur une séquence (comme une liste, un tuple ou un dictionnaire).",
+          "ordre": 9,
+          "exemples": [
+            "fruits = [\"pomme\", \"banane\"]\nfor x in fruits:\n  print(x)"
+          ],
+          "exercices": [
+            {
+              "id": "ex_for_1",
+              "instruction": "Parcourez la liste 'fruits'",
+              "codeAvant": "for x ",
+              "codeApres": " fruits:",
+              "options": ["in", "at", "into"],
+              "reponseCorrecte": "in",
+              "explication": "On lit : 'Pour chaque x DANS fruits'.",
+              "indice": "Le mot-clé signifie 'dans' en anglais.",
+              "points": 30
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u4",
+      "titre": "Unité 4 : Les Fonctions",
+      "description": "Réutiliser son code intelligemment",
+      "lecons": [
+        {
+          "id": "py_func",
+          "titre": "Définir une Fonction",
+          "theorie": "Une fonction est un bloc de code qui ne s'exécute que lorsqu'il est appelé. On utilise le mot-clé `def`.",
+          "ordre": 10,
+          "exemples": [
+            "def ma_fonction():\n  print(\"Hello de la fonction\")\n\nma_fonction()"
+          ],
+          "exercices": [
+            {
+              "id": "ex_func_1",
+              "instruction": "Créez une fonction nommée 'salut'",
+              "codeAvant": "",
+              "codeApres": " salut():",
+              "options": ["def", "function", "create"],
+              "reponseCorrecte": "def",
+              "explication": "def est l'abréviation de 'define'.",
+              "indice": "3 lettres pour définir.",
+              "points": 35
+            }
+          ]
+        },
+        {
+          "id": "py_param",
+          "titre": "Arguments",
+          "theorie": "Les informations peuvent être transmises aux fonctions en tant qu'arguments.",
+          "ordre": 11,
+          "exemples": [
+            "def bonjour(prenom):\n  print(\"Bonjour \" + prenom)"
+          ],
+          "exercices": [
+            {
+              "id": "ex_param_1",
+              "instruction": "Appelez la fonction avec 'Alice'",
+              "codeAvant": "bonjour(",
+              "codeApres": ")",
+              "options": ["\"Alice\"", "Alice", "arg='Alice'"],
+              "reponseCorrecte": "\"Alice\"",
+              "explication": "On passe la valeur directement entre les parenthèses.",
+              "indice": "C'est une chaîne de caractères.",
+              "points": 40
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u5",
+      "titre": "Unité 5 : Dictionnaires",
+      "description": "Stocker des données Clé:Valeur",
+      "lecons": [
+        {
+          "id": "py_dict",
+          "titre": "Les Dictionnaires",
+          "theorie": "Un dictionnaire est une collection ordonnée (depuis 3.7), modifiable et qui ne permet pas de doublons. On utilise des accolades `{}`.",
+          "ordre": 12,
+          "exemples": [
+            "voiture = {\n  \"marque\": \"Ford\",\n  \"annee\": 1964\n}"
+          ],
+          "exercices": [
+            {
+              "id": "ex_dict_1",
+              "instruction": "Changez l'année pour 2020",
+              "codeAvant": "voiture[\"annee\"] = ",
+              "codeApres": "",
+              "options": ["2020", "\"2020\"", "year=2020"],
+              "reponseCorrecte": "2020",
+              "explication": "On accède à la valeur via sa clé entre crochets.",
+              "indice": "C'est un nombre entier.",
+              "points": 50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u6",
+      "titre": "Unité 6 : Classes & Objets",
+      "description": "Introduction à l'Orienté Objet",
+      "lecons": [
+        {
+          "id": "py_class",
+          "titre": "Créer une Classe",
+          "theorie": "Python est un langage orienté objet. Presque tout en Python est un objet. Une classe est comme un 'plan' pour créer des objets.",
+          "ordre": 13,
+          "exemples": [
+            "class MaClasse:\n  x = 5\n\np1 = MaClasse()\nprint(p1.x)"
+          ],
+          "exercices": [
+            {
+              "id": "ex_class_1",
+              "instruction": "Déclarez une classe 'Robot'",
+              "codeAvant": "",
+              "codeApres": " Robot:",
+              "options": ["class", "object", "def"],
+              "reponseCorrecte": "class",
+              "explication": "On utilise le mot-clé class.",
+              "indice": "C'est le mot anglais pour 'classe'.",
+              "points": 60
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
