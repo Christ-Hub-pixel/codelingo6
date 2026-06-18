@@ -22,6 +22,26 @@ class NotificationService {
     await _notifications.initialize(initializationSettings);
   }
 
+  static Future<void> afficherNotificationInstantanee(String titre, String corps) async {
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: AndroidNotificationDetails(
+        'instant_notifications',
+        'Notifications instantanées',
+        channelDescription: 'Canal pour les notifications immédiates',
+        importance: Importance.max,
+        priority: Priority.high,
+      ),
+      iOS: DarwinNotificationDetails(),
+    );
+
+    await _notifications.show(
+      DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      titre,
+      corps,
+      platformChannelSpecifics,
+    );
+  }
+
   static Future<void> programmerRappelQuotidien() async {
     final sentimentalMessages = [
       {'titre': 'Codie est triste... 😢', 'corps': 'Tu lui manques terriblement. Reviens coder un peu ?'},

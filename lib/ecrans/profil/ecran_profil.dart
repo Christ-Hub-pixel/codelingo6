@@ -1,14 +1,57 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
 import '../../fournisseurs/progression_fournisseur.dart';
 import '../../composants/index.dart';
 import '../../services/cloud_service.dart';
 import '../../utils/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../inscription/ecran_inscription.dart';
+import '../../services/traduction_service.dart';
 
 class EcranProfil extends StatelessWidget {
   const EcranProfil({super.key});
+
+  Future<void> _modifierPhotoProfil(BuildContext context, ProgressionFournisseur progression) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      
+      if (image != null) {
+        // Lire les octets
+        final bytes = await image.readAsBytes();
+        
+        // Décoder l'image
+        img.Image? decodedImage = img.decodeImage(bytes);
+        
+        if (decodedImage != null) {
+          // Redimensionner et compresser pour éviter une chaîne base64 trop grande (max 200x200)
+          img.Image resized = img.copyResize(decodedImage, width: 200);
+          List<int> compressed = img.encodeJpg(resized, quality: 70);
+          
+          // Convertir en Base64
+          String base64String = base64Encode(compressed);
+          
+          // Mettre à jour dans le provider
+          progression.mettreAJourAvatarPersonnalise(base64String);
+          
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Photo de profil mise à jour avec succès !')),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur lors du chargement de l\'image: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +100,11 @@ class EcranProfil extends StatelessWidget {
                             const SizedBox(height: 20),
                             _buildAvatarPicker(context, progression),
                             const SizedBox(height: 16),
-                            const Text(
-                              'Codie Master',
-                              style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900),
+                            Text(
+                              FirebaseAuth.instance.currentUser?.displayName?.isNotEmpty == true
+                                  ? FirebaseAuth.instance.currentUser!.displayName!
+                                  : 'Codie Master',
+                              style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900),
                             ),
                             const SizedBox(height: 8),
                             Container(
@@ -130,13 +175,13 @@ class EcranProfil extends StatelessWidget {
                       _buildCloudCard(progression, context, isDark),
                       
                       const SizedBox(height: 32),
-                      _buildSectionHeader('PARAMÈTRES', isDark),
+                      _buildSectionHeader(TraductionService.t('reglages').toUpperCase(), isDark),
                       const SizedBox(height: 12),
-                      _buildSettingsGroup(progression, isDark),
+                      _buildSettingsGroup(progression, context, isDark),
                       
                       const SizedBox(height: 40),
                       BoutonDuo(
-                        texte: 'SE DÉCONNECTER',
+                        texte: TraductionService.t('se_deconnecter'),
                         couleur: AppColors.danger,
                         onPressed: () => _handleLogout(context),
                       ),
@@ -603,22 +648,15 @@ class EcranProfil extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsGroup(ProgressionFournisseur progression, bool isDark) {
+  Widget _buildSettingsGroup(ProgressionFournisseur progression, BuildContext context, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 8, bottom: 12),
-          child: Text(
-            'RÉGLAGES',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: AppColors.primary, letterSpacing: 1.5),
-          ),
-        ),
         Container(
           decoration: AppDecorations.card(dark: isDark),
           child: Column(
             children: [
-              _buildSettingsTile(Icons.dark_mode_rounded, 'Mode Sombre', isDark, 
+              _buildSettingsTile(Icons.dark_mode_rounded, TraductionService.t('mode_sombre'), isDark, 
                 trailing: Switch(
                   value: progression.estModeSombre,
                   onChanged: (val) => progression.toggleModeSombre(),
@@ -626,9 +664,24 @@ class EcranProfil extends StatelessWidget {
                 )
               ),
               const Divider(height: 1, indent: 50, endIndent: 20, color: Colors.black12),
-              _buildSettingsTile(Icons.language_rounded, 'Langue d\'apprentissage', isDark, value: progression.langueApprise),
+              _buildSettingsTile(
+                Icons.language_rounded, 
+                TraductionService.t('langue_apprentissage'), 
+                isDark, 
+                value: progression.langueApprise,
+                onTap: () => _afficherChoixLangue(context, progression),
+              ),
               const Divider(height: 1, indent: 50, endIndent: 20, color: Colors.black12),
-              _buildSettingsTile(Icons.notifications_active_rounded, 'Notifications', isDark),
+              _buildSettingsTile(
+                Icons.notifications_active_rounded, 
+                TraductionService.t('notifications'), 
+                isDark,
+                trailing: Switch(
+                  value: progression.notificationsActives,
+                  onChanged: (val) => progression.toggleNotifications(),
+                  activeThumbColor: AppColors.primary,
+                ),
+              ),
             ],
           ),
         ),
@@ -636,8 +689,9 @@ class EcranProfil extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsTile(IconData icon, String title, bool isDark, {Widget? trailing, String? value}) {
+  Widget _buildSettingsTile(IconData icon, String title, bool isDark, {Widget? trailing, String? value, VoidCallback? onTap}) {
     return ListTile(
+      onTap: onTap,
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -654,6 +708,36 @@ class EcranProfil extends StatelessWidget {
           const SizedBox(width: 4),
           const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
         ],
+      ),
+    );
+  }
+
+  void _afficherChoixLangue(BuildContext context, ProgressionFournisseur progression) {
+    final langues = ['Python', 'Javascript', 'HTML/CSS', 'Dart', 'Java'];
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: progression.estModeSombre ? AppColors.cardDark : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(TraductionService.t('choisir_langue_apprendre'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 16),
+            ...langues.map((langue) => ListTile(
+              title: Text(langue, style: TextStyle(fontWeight: progression.langueApprise == langue ? FontWeight.bold : FontWeight.normal)),
+              trailing: progression.langueApprise == langue ? const Icon(Icons.check_circle_rounded, color: AppColors.primary) : null,
+              onTap: () {
+                progression.setLangueApprise(langue);
+                Navigator.pop(context);
+              },
+            )),
+          ],
+        ),
       ),
     );
   }
@@ -682,7 +766,7 @@ class EcranProfil extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: avatars.map((avatar) {
-                bool isSel = progression.avatarPath == avatar['path'];
+                bool isSel = progression.avatarPath == avatar['path'] && progression.avatarBase64 == null;
                 return GestureDetector(
                   onTap: () {
                     progression.setAvatar(avatar['path']!);
@@ -708,6 +792,22 @@ class EcranProfil extends StatelessWidget {
                   ),
                 );
               }).toList(),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+                _modifierPhotoProfil(context, progression);
+              },
+              icon: const Icon(Icons.photo_library_rounded),
+              label: const Text('Importer une photo', style: TextStyle(fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryLight,
+                foregroundColor: AppColors.primary,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
             ),
           ],
         ),

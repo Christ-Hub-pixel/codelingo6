@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:highlight/highlight.dart' show highlight, Node;
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
+import '../services/audio_service.dart';
 
 class EditeurCode extends StatefulWidget {
   final String codeInitial;
@@ -32,6 +33,8 @@ class _EditeurCodeState extends State<EditeurCode> {
 
   void _executerCode() async {
     if (_controller.text.trim().isEmpty) return;
+
+    AudioService.jouerSonExecutionCode();
 
     setState(() {
       _isRunning = true;
@@ -82,11 +85,13 @@ class _EditeurCodeState extends State<EditeurCode> {
           _output = executionOutput;
         });
       } else {
+        AudioService.jouerSonErreur();
         setState(() {
           _output = "Erreur du serveur (Code ${response.statusCode})\n${response.body}";
         });
       }
     } catch (e) {
+      AudioService.jouerSonErreur();
       setState(() {
         _output = "Erreur de connexion : Impossible de joindre le serveur d'exécution.\nVérifiez votre connexion internet.";
       });

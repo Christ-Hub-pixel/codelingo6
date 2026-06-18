@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../utils/theme.dart';
 
 import 'package:flutter/services.dart';
+import '../../services/audio_service.dart';
 
 class BoutonDuo extends StatefulWidget {
   final String texte;
@@ -38,6 +39,7 @@ class _BoutonDuoState extends State<BoutonDuo> {
       child: GestureDetector(
         onTapDown: widget.estActif ? (_) {
           HapticFeedback.lightImpact();
+          AudioService.jouerSonBouton();
           setState(() => _estAppuye = true);
         } : null,
         onTapUp: widget.estActif ? (_) {

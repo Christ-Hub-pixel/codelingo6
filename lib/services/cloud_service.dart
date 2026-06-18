@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:ui' as ui;
 
 class CloudService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -8,10 +9,10 @@ class CloudService {
 
   // --- Authentification ---
 
-  static Future<UserCredential?> sinscrire(String email, String password) async {
+  static Future<UserCredential?> sinscrire(String email, String password, String nom) async {
     final userCred = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     if (userCred.user != null) {
-      await initialiserDonneesParDefaut(userCred.user!.uid);
+      await initialiserDonneesParDefaut(userCred.user!.uid, nom: nom);
     }
     return userCred;
   }
@@ -25,7 +26,7 @@ class CloudService {
     if (userCred.user != null) {
       final doc = await _firestore.collection('utilisateurs').doc(userCred.user!.uid).get();
       if (!doc.exists) {
-        await initialiserDonneesParDefaut(userCred.user!.uid);
+        await initialiserDonneesParDefaut(userCred.user!.uid, nom: 'Invité');
       }
     }
     return userCred;
@@ -37,8 +38,15 @@ class CloudService {
 
   // --- Base de Données (Progression) ---
 
-  static Future<void> initialiserDonneesParDefaut(String uid) async {
+  static Future<void> initialiserDonneesParDefaut(String uid, {String? nom}) async {
+    String region = 'US';
+    try {
+      region = ui.PlatformDispatcher.instance.locale.countryCode ?? 'US';
+    } catch (_) {}
+
     final Map<String, dynamic> donneesDefaut = {
+      'nom': nom ?? 'Utilisateur',
+      'region': region,
       'progression': {
         'vies': 5,
         'gemmes': 350,
@@ -47,6 +55,7 @@ class CloudService {
         'langue_apprise': 'Python',
         'est_mode_sombre': 0,
         'avatar_path': 'assets/images/joyeuse.png',
+        'avatar_base64': null,
         'xp_total': 0,
         'ligue': 'Bronze',
         'victoires_duels': 0,
@@ -93,6 +102,33 @@ class CloudService {
     final user = _auth.currentUser;
     if (user == null) return const Stream.empty();
     return _firestore.collection('utilisateurs').doc(user.uid).snapshots();
+  }
+
+  // --- Classement ---
+
+  static Future<List<Map<String, dynamic>>> obtenirClassementRegion(String region) async {
+    try {
+      final snapshot = await _firestore
+          .collection('utilisateurs')
+          .where('region', isEqualTo: region)
+          .get();
+
+      final users = snapshot.docs.map((doc) => {
+        'uid': doc.id,
+        ...doc.data()
+      }).toList();
+
+      users.sort((a, b) {
+        final xpA = a['progression']?['xp_total'] ?? 0;
+        final xpB = b['progression']?['xp_total'] ?? 0;
+        return (xpB as int).compareTo(xpA as int);
+      });
+
+      return users.take(50).toList();
+    } catch (e) {
+      debugPrint("Erreur chargement classement: $e");
+      return [];
+    }
   }
 
   // --- Social ---

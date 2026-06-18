@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../fournisseurs/progression_fournisseur.dart';
+import '../services/audio_service.dart';
 
 class MascotteAnimee extends StatefulWidget {
   final String imagePath;
@@ -8,8 +12,8 @@ class MascotteAnimee extends StatefulWidget {
   const MascotteAnimee({
     super.key,
     required this.imagePath,
-    this.height = 150,
-    this.width = 150,
+    this.height = 120,
+    this.width = 120,
   });
 
   @override
@@ -18,39 +22,50 @@ class MascotteAnimee extends StatefulWidget {
 
 class MascotteAnimeeState extends State<MascotteAnimee> with TickerProviderStateMixin {
   late AnimationController _floatController;
-  late AnimationController _jumpController;
   late Animation<double> _floatAnimation;
+
+  late AnimationController _jumpController;
   late Animation<double> _jumpAnimation;
 
   @override
   void initState() {
     super.initState();
-    
-    // Animation de flottement (Idle)
+    // Animation de flottement continue
     _floatController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    _floatAnimation = Tween<double>(begin: 0, end: 10).animate(
+    _floatAnimation = Tween<double>(begin: -10, end: 10).animate(
       CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
     );
 
-    // Animation de saut (Joy)
+    // Animation de saut (déclenchée occasionnellement)
     _jumpController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
 
     _jumpAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween<double>(begin: 0, end: -30).chain(CurveTween(curve: Curves.easeOut)), weight: 50),
-      TweenSequenceItem(tween: Tween<double>(begin: -30, end: 0).chain(CurveTween(curve: Curves.bounceOut)), weight: 50),
-    ]).animate(_jumpController);
+      TweenSequenceItem(tween: Tween(begin: 0, end: -30), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -30, end: 0), weight: 1),
+    ]).animate(CurvedAnimation(parent: _jumpController, curve: Curves.easeInOut));
+
+    _lancerSautsAleatoires();
   }
 
   void sauter() {
     if (!_jumpController.isAnimating) {
       _jumpController.forward(from: 0);
+    }
+  }
+
+  void _lancerSautsAleatoires() async {
+    while (mounted) {
+      await Future.delayed(Duration(seconds: 5 + (5 * (DateTime.now().second % 3)))); // Aléatoire
+      if (mounted) {
+        _jumpController.forward(from: 0);
+      }
     }
   }
 
@@ -66,11 +81,31 @@ class MascotteAnimeeState extends State<MascotteAnimee> with TickerProviderState
     return AnimatedBuilder(
       animation: Listenable.merge([_floatAnimation, _jumpAnimation]),
       builder: (context, child) {
+        // Appliquer la tenue si une est équipée
+        String currentImagePath = widget.imagePath;
+        String? base64Image;
+        
+        try {
+          final progression = context.watch<ProgressionFournisseur>();
+          if (progression.tenueActuelle != 'Defaut') {
+            currentImagePath = progression.avatarPath;
+          } else if (progression.avatarBase64 != null) {
+            base64Image = progression.avatarBase64;
+          }
+        } catch (_) {
+          // Si on n'est pas dans le contexte du provider (rare, mais prudent)
+        }
+
         return Transform.translate(
           offset: Offset(0, _floatAnimation.value + _jumpAnimation.value),
-          child: Container(
-            height: widget.height,
-            width: widget.width,
+          child: GestureDetector(
+            onTap: () {
+              sauter();
+              AudioService.jouerSonMessage();
+            },
+            child: Container(
+              height: widget.height,
+              width: widget.width,
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -85,10 +120,16 @@ class MascotteAnimeeState extends State<MascotteAnimee> with TickerProviderState
               ],
             ),
             child: ClipOval(
-              child: Image.asset(widget.imagePath, fit: BoxFit.cover),
+              child: base64Image != null 
+                ? Image.memory(
+                    base64Decode(base64Image),
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(currentImagePath, fit: BoxFit.cover),
             ),
           ),
-        );
+        ),
+      );
       },
     );
   }

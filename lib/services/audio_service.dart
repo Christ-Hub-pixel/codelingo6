@@ -4,27 +4,35 @@ import 'package:flutter/foundation.dart';
 class AudioService {
 
   static Future<void> jouerSonSucces() async {
-    await _jouer('audio/succes.mp3');
+    await _jouer('audio/notification-de-reussite.wav');
   }
 
   static Future<void> jouerSonErreur() async {
-    await _jouer('audio/erreur.mp3');
+    await _jouer('audio/notification-de-echoue.wav');
   }
 
   static Future<void> jouerSonBouton() async {
-    await _jouer('audio/clic.mp3');
+    await _jouer('audio/notification-de-message.wav');
+  }
+
+  static Future<void> jouerSonMessage() async {
+    await _jouer('audio/notification-de-message.wav');
+  }
+
+  static Future<void> jouerSonExecutionCode() async {
+    await _jouer('audio/notification-editeurcode-run.wav');
   }
 
   static Future<void> jouerSonGemmes() async {
-    await _jouer('audio/gemmes.mp3');
+    await _jouer('audio/notification-de-reussite.wav');
   }
 
   static Future<void> jouerSonVictoire() async {
-    await _jouer('audio/victoire.mp3');
+    await _jouer('audio/notification-de-reussite.wav');
   }
 
   static Future<void> jouerSonLigue() async {
-    await _jouer('audio/ligue.mp3');
+    await _jouer('audio/notification-de-reussite.wav');
   }
 
   static Future<void> _jouer(String path) async {

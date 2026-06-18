@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../composants/index.dart';
 import '../inscription/ecran_inscription.dart';
 import '../accueil/ecran_principal.dart';
-import '../langue/ecran_langue.dart';
+
 import '../../services/traduction_service.dart';
 import '../../services/securite_service.dart';
 import '../../utils/theme.dart';
@@ -179,7 +179,7 @@ class _EcranConnexionState extends State<EcranConnexion> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                // Bouton Invité (Test)
+                // Bouton Démonstration
                 TextButton(
                   onPressed: () async {
                     final erreur = await authFournisseur.seConnecterAnonymement();
@@ -187,7 +187,7 @@ class _EcranConnexionState extends State<EcranConnexion> {
                       if (context.mounted) {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const EcranLangue()),
+                          MaterialPageRoute(builder: (context) => const EcranPrincipal()),
                         );
                       }
                     } else {
@@ -196,12 +196,19 @@ class _EcranConnexionState extends State<EcranConnexion> {
                       }
                     }
                   },
-                  child: const Text(
-                    "Continuer en tant qu'invité (Test)",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontWeight: FontWeight.w600,
-                      decoration: TextDecoration.underline,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                    ),
+                    child: const Text(
+                      "Démonstration (Ouverte à tous)",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),

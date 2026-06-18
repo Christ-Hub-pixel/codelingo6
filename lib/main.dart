@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'ecrans/splash/ecran_splash.dart';
 import 'ecrans/accueil/ecran_principal.dart';
+import 'ecrans/langue/ecran_langue_maternelle.dart';
 import 'fournisseurs/progression_fournisseur.dart';
 import 'fournisseurs/notification_fournisseur.dart';
 import 'fournisseurs/auth_fournisseur.dart';
-import 'services/notification_service.dart';
-import 'firebase_options.dart';
 import 'utils/theme.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,12 +20,9 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    debugPrint("Firebase non configuré: $e");
+    debugPrint("Firebase déjà initialisé ou erreur: $e");
   }
-
-  await NotificationService.initialiser();
-  await NotificationService.programmerRappelQuotidien();
-
+  
   runApp(
     MultiProvider(
       providers: [
@@ -49,7 +47,7 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: progression.estModeSombre ? ThemeMode.dark : ThemeMode.light,
-      home: const AuthWrapper(),
+      home: const EcranSplash(),
     );
   }
 }
@@ -64,7 +62,8 @@ class AuthWrapper extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            backgroundColor: Color(0xFF312E81),
+            body: Center(child: CircularProgressIndicator(color: Colors.white)),
           );
         }
         
@@ -72,7 +71,7 @@ class AuthWrapper extends StatelessWidget {
           return const EcranPrincipal();
         }
         
-        return const EcranSplash();
+        return const EcranLangueMaternelle();
       },
     );
   }

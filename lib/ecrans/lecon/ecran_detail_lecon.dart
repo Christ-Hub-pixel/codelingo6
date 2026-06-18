@@ -7,6 +7,7 @@ import '../../services/haptic_service.dart';
 import '../accueil/ecran_recompense.dart';
 import '../../utils/theme.dart';
 import '../../services/audio_service.dart';
+import '../../services/notification_service.dart';
 import 'package:provider/provider.dart';
 import '../../fournisseurs/progression_fournisseur.dart';
 
@@ -74,6 +75,7 @@ class _EcranDetailLeconState extends State<EcranDetailLecon> with WidgetsBinding
         HapticService.error();
         AudioService.jouerSonErreur();
         progression.perdreVie(); // L'erreur a un coût !
+        NotificationService.afficherNotificationInstantanee('Courage ! 💪', 'L\'erreur est le meilleur moyen d\'apprendre, continue !');
       } else {
         HapticService.success();
         AudioService.jouerSonSucces();
@@ -105,11 +107,11 @@ class _EcranDetailLeconState extends State<EcranDetailLecon> with WidgetsBinding
       "Impressionnant !",
     ];
     final erreurs = [
-      "Ce n'est pas grave !",
-      "Réessaie, tu vas y arriver !",
-      "Presque ! Analyse bien le code.",
-      "Codie croit en toi !",
-      "Chaque erreur fait progresser.",
+      "Ce n'est pas grave, n'abandonne jamais !",
+      "Réessaie, tu vas y arriver ! Le code c'est de la persévérance.",
+      "Presque ! Analyse bien le code et n'abandonne jamais.",
+      "Codie croit en toi ! N'abandonne pas, on apprend de ses erreurs.",
+      "Chaque erreur te fait progresser. N'abandonne jamais !",
     ];
     
     final liste = estCorrect ? succes : erreurs;
@@ -219,6 +221,7 @@ class _EcranDetailLeconState extends State<EcranDetailLecon> with WidgetsBinding
       final progression = Provider.of<ProgressionFournisseur>(context, listen: false);
       progression.completerLecon(widget.lecon.ordre);
       AudioService.jouerSonVictoire();
+      NotificationService.afficherNotificationInstantanee('Félicitations ! 🏆', 'Tu as brillamment terminé cette leçon, continue sur ta lancée !');
       
       Navigator.pushReplacement(
         context,

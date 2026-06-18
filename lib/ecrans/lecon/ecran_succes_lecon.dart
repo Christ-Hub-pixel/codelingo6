@@ -38,43 +38,126 @@ class _EcranSuccesLeconState extends State<EcranSuccesLecon> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF1E1B4B), // Fond sombre plus élégant pour faire ressortir la lumière
       body: Stack(
         children: [
+          // Effet de lumière de fond
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.15,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.amber.withValues(alpha: 0.3),
+                      blurRadius: 100,
+                      spreadRadius: 50,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const MascotteAnimee(
-                    imagePath: 'assets/images/joyeuse.png',
-                    height: 180,
-                    width: 180,
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    TraductionService.t('lecon_terminee'),
-                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF58CC02)),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.5, end: 1.0),
+                    duration: const Duration(milliseconds: 1200),
+                    curve: Curves.elasticOut,
+                    builder: (context, scale, child) {
+                      return Transform.scale(
+                        scale: scale,
+                        child: child,
+                      );
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.amberAccent.withValues(alpha: 0.5),
+                            blurRadius: 60,
+                            spreadRadius: 20,
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: Image.asset(
+                          'assets/images/recompense.png',
+                          height: 220,
+                          width: 220,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 40),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 800),
+                    builder: (context, opacity, child) {
+                      return Opacity(
+                        opacity: opacity,
+                        child: Transform.translate(
+                          offset: Offset(0, 20 * (1 - opacity)),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Text(
+                          TraductionService.t('lecon_terminee').toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.amberAccent,
+                            letterSpacing: 2,
+                            shadows: [Shadow(color: Colors.black45, blurRadius: 10, offset: Offset(0, 4))],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "Super travail ! Voici tes récompenses :",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 48),
                   
                   // Cartes de score
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildRewardCard('⚡', widget.xpGagnee.toString(), 'TOTAL XP', Colors.orange),
-                      _buildRewardCard('💎', widget.gemmesGagnees.toString(), 'GEMS', Colors.blue),
+                      _buildRewardCard('⚡', widget.xpGagnee.toString(), 'XP GAGNÉE', Colors.orangeAccent),
+                      _buildRewardCard('💎', widget.gemmesGagnees.toString(), 'GEMMES', Colors.cyanAccent),
                     ],
                   ),
                   
-                  const SizedBox(height: 60),
+                  const Spacer(),
                   
                   BoutonDuo(
-                    texte: TraductionService.t('continuer'),
+                    texte: TraductionService.t('continuer').toUpperCase(),
                     couleur: const Color(0xFF58CC02),
                     onPressed: () => Navigator.pop(context),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -87,7 +170,11 @@ class _EcranSuccesLeconState extends State<EcranSuccesLecon> {
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
               shouldLoop: false,
-              colors: const [Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple],
+              emissionFrequency: 0.05,
+              numberOfParticles: 50,
+              maxBlastForce: 100,
+              minBlastForce: 80,
+              colors: const [Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.yellow, Colors.purple],
             ),
           ),
         ],

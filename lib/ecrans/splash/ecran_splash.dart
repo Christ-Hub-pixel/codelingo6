@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../langue/ecran_langue_maternelle.dart';
+import '../../main.dart'; // Pour AuthWrapper
 import '../../services/audio_service.dart';
-
+import '../../services/notification_service.dart';
 class EcranSplash extends StatefulWidget {
   const EcranSplash({super.key});
 
@@ -43,20 +43,39 @@ class _EcranSplashState extends State<EcranSplash> with TickerProviderStateMixin
     _mainController.forward();
     AudioService.jouerSonVictoire();
 
-    Future.delayed(const Duration(seconds: 5), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const EcranLangueMaternelle(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 1000),
-          ),
-        );
+    _initialiserEtNaviguer();
+  }
+
+  Future<void> _initialiserEtNaviguer() async {
+    // On s'assure que l'animation dure au moins 2.5 secondes pour être visible
+    final tempsMin = Future.delayed(const Duration(milliseconds: 2500));
+    
+    // Initialisation asynchrone des services lourds
+    Future<void> initFutures = () async {
+      try {
+        await NotificationService.initialiser();
+        await NotificationService.programmerRappelQuotidien();
+      } catch (e) {
+        debugPrint("Erreur d'initialisation: $e");
       }
-    });
+    }();
+
+    // On attend que les deux soient terminés (le timer minimum ET l'initialisation)
+    await Future.wait([tempsMin, initFutures]);
+
+    if (!mounted) return;
+
+    // Redirection fluide vers AuthWrapper qui déterminera l'écran final (Accueil ou Langue)
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => const AuthWrapper(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        transitionDuration: const Duration(milliseconds: 1000),
+      ),
+    );
   }
 
   @override
