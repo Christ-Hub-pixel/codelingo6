@@ -34,6 +34,56 @@ class _EditeurCodeState extends State<EditeurCode> {
   void _executerCode() async {
     if (_controller.text.trim().isEmpty) return;
 
+    String stdinInputs = '';
+    // Détecter si le code demande des entrées utilisateur
+    if (_controller.text.contains('input(')) {
+      final result = await showDialog<String>(
+        context: context,
+        builder: (context) {
+          final stdinCtrl = TextEditingController();
+          return AlertDialog(
+            backgroundColor: const Color(0xFF23241f),
+            title: const Text('Entrée requise (stdin)', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Votre code utilise la fonction input().\nSaisissez les valeurs ci-dessous (une par ligne) :', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: stdinCtrl,
+                  maxLines: 4,
+                  style: const TextStyle(color: Colors.greenAccent, fontFamily: 'monospace'),
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Color(0xFF1E1E1E),
+                    border: OutlineInputBorder(),
+                    hintText: 'Ex: Alice\\n25',
+                    hintStyle: TextStyle(color: Colors.white30),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, null),
+                child: const Text('Annuler', style: TextStyle(color: Colors.redAccent)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.greenAccent, foregroundColor: Colors.black),
+                onPressed: () => Navigator.pop(context, stdinCtrl.text),
+                child: const Text('Exécuter', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ],
+          );
+        }
+      );
+      
+      // Si l'utilisateur annule la boîte de dialogue, on arrête l'exécution
+      if (result == null) return;
+      stdinInputs = result;
+    }
+
     AudioService.jouerSonExecutionCode();
 
     setState(() {
@@ -53,7 +103,7 @@ class _EditeurCodeState extends State<EditeurCode> {
           'compiler': 'python311',
           'options': {
             'userArguments': '',
-            'executeParameters': {'args': '', 'stdin': ''},
+            'executeParameters': {'args': '', 'stdin': stdinInputs},
             'compilerOptions': {'executorRequest': true},
             'filters': {'execute': true}
           }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -25,21 +26,27 @@ class NotificationService {
   static Future<void> afficherNotificationInstantanee(String titre, String corps) async {
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: AndroidNotificationDetails(
-        'instant_notifications',
+        'instant_notifications_v2',
         'Notifications instantanées',
         channelDescription: 'Canal pour les notifications immédiates',
         importance: Importance.max,
         priority: Priority.high,
+        sound: RawResourceAndroidNotificationSound('rappel_notification'),
+        playSound: true,
       ),
       iOS: DarwinNotificationDetails(),
     );
 
-    await _notifications.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      titre,
-      corps,
-      platformChannelSpecifics,
-    );
+    try {
+      await _notifications.show(
+        DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        titre,
+        corps,
+        platformChannelSpecifics,
+      );
+    } catch (e) {
+      debugPrint("Erreur d'affichage notification instantanée: $e");
+    }
   }
 
   static Future<void> programmerRappelQuotidien() async {
@@ -53,26 +60,32 @@ class NotificationService {
     final randomMessage = sentimentalMessages[Random().nextInt(sentimentalMessages.length)];
 
 
-    await _notifications.zonedSchedule(
-      0,
-      randomMessage['titre']!,
-      randomMessage['corps']!,
-      _suivanteInstanceDe18h(),
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'rappel_sentimental_canal',
-          'Rappels Émotionnels',
-          channelDescription: 'Notifications sentimentales pour encourager la pratique',
-          importance: Importance.max,
-          priority: Priority.high,
+    try {
+      await _notifications.zonedSchedule(
+        0,
+        randomMessage['titre']!,
+        randomMessage['corps']!,
+        _suivanteInstanceDe18h(),
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'rappel_sentimental_canal_v2',
+            'Rappels Émotionnels',
+            channelDescription: 'Notifications sentimentales pour encourager la pratique',
+            importance: Importance.max,
+            priority: Priority.high,
+            sound: RawResourceAndroidNotificationSound('rappel_notification'),
+            playSound: true,
+          ),
+          iOS: DarwinNotificationDetails(),
         ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+    } catch (e) {
+      debugPrint("Erreur lors de la programmation de la notification: $e");
+    }
   }
 
   static tz.TZDateTime _suivanteInstanceDe18h() {

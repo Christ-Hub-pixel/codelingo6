@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import '../services/cloud_service.dart';
-import '../services/notification_service.dart';
 
 class AuthFournisseur with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -30,8 +29,6 @@ class AuthFournisseur with ChangeNotifier {
       final userCred = await CloudService.seConnecter(email, password);
       _setLoading(false);
       if (userCred != null && userCred.user != null) {
-        await NotificationService.afficherNotificationInstantanee('👋 Bon retour !', 'Content de te revoir, continuons ta progression !');
-        await NotificationService.programmerRappelQuotidien();
         return null;
       } else {
         return "Échec de la connexion. Vérifiez vos identifiants.";
@@ -52,8 +49,6 @@ class AuthFournisseur with ChangeNotifier {
         _user = _auth.currentUser;
         notifyListeners();
         _setLoading(false);
-        await NotificationService.afficherNotificationInstantanee('🎉 Bienvenue sur Codelingo !', 'Ton aventure commence ici !');
-        await NotificationService.programmerRappelQuotidien();
         return null;
       } else {
         _setLoading(false);
@@ -71,8 +66,6 @@ class AuthFournisseur with ChangeNotifier {
       final userCred = await CloudService.seConnecterAnonymement();
       _setLoading(false);
       if (userCred != null && userCred.user != null) {
-        await NotificationService.afficherNotificationInstantanee('🕵️ Bienvenue invité !', 'Découvre l\'application librement !');
-        await NotificationService.programmerRappelQuotidien();
         return null;
       } else {
         return "Échec de la connexion anonyme.";
@@ -91,19 +84,23 @@ class AuthFournisseur with ChangeNotifier {
     if (e is FirebaseAuthException) {
       switch (e.code) {
         case 'user-not-found':
-          return "Aucun utilisateur trouvé pour cet email.";
+          return "Aucun compte trouvé pour cet email.";
         case 'wrong-password':
           return "Mot de passe incorrect.";
-        case 'email-already-in-use':
-          return "Cet email est déjà utilisé.";
+        case 'invalid-credential':
+          return "Email ou mot de passe incorrect.";
         case 'invalid-email':
           return "Adresse email invalide.";
+        case 'network-request-failed':
+          return "Pas de connexion internet.";
         case 'weak-password':
           return "Le mot de passe est trop faible.";
+        case 'email-already-in-use':
+          return "Cet email est déjà utilisé. Veuillez vous connecter.";
         default:
-          return "Une erreur s'est produite : ${e.message}";
+          return "Erreur d'authentification : ${e.message}";
       }
     }
-    return "Une erreur inattendue s'est produite.";
+    return "Erreur inattendue : ${e.toString()}";
   }
 }

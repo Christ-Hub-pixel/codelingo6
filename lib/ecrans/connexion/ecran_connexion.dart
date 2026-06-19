@@ -178,40 +178,7 @@ class _EcranConnexionState extends State<EcranConnexion> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                // Bouton Démonstration
-                TextButton(
-                  onPressed: () async {
-                    final erreur = await authFournisseur.seConnecterAnonymement();
-                    if (erreur == null) {
-                      if (context.mounted) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const EcranPrincipal()),
-                        );
-                      }
-                    } else {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(erreur), backgroundColor: AppColors.danger));
-                      }
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                    ),
-                    child: const Text(
-                      "Démonstration (Ouverte à tous)",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
+
                 const SizedBox(height: 20),
               ],
             ),

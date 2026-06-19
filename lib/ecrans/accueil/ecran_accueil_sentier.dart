@@ -51,7 +51,7 @@ class EcranAccueilSentier extends StatelessWidget {
                       const SizedBox(width: 8),
                       _buildStatItem('❤️', '${progression.vies}', AppColors.danger),
                       const SizedBox(width: 8),
-                      _buildLeagueBadge(progression.ligueActuelle),
+                      _buildLeagueBadge(progression),
                     ],
                   ),
                 ),
@@ -406,31 +406,66 @@ class EcranAccueilSentier extends StatelessWidget {
     );
   }
 
-  Widget _buildLeagueBadge(String ligue) {
+  Widget _buildLeagueBadge(ProgressionFournisseur progression) {
+    String ligue = progression.ligueActuelle;
+    int xp = progression.xpTotal;
     Color color;
     String icon;
+    int prevThreshold = 0;
+    int nextThreshold = 400;
+
     switch (ligue) {
-      case 'Argent': color = Colors.grey[400]!; icon = '🥈'; break;
-      case 'Or': color = Colors.amber; icon = '🥇'; break;
-      case 'Diamant': color = Colors.cyanAccent; icon = '💎'; break;
-      default: color = Colors.brown[300]!; icon = '🥉';
+      case 'Diamant': 
+        color = Colors.cyanAccent; icon = '💎'; 
+        prevThreshold = 3000; nextThreshold = 10000;
+        break;
+      case 'Or': 
+        color = Colors.amber; icon = '🥇'; 
+        prevThreshold = 1200; nextThreshold = 3000;
+        break;
+      case 'Argent': 
+        color = Colors.grey[400]!; icon = '🥈'; 
+        prevThreshold = 400; nextThreshold = 1200;
+        break;
+      default: 
+        color = Colors.brown[300]!; icon = '🥉';
+        prevThreshold = 0; nextThreshold = 400;
     }
 
+    double progress = (xp >= 3000) ? 1.0 : (xp - prevThreshold) / (nextThreshold - prevThreshold);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color, width: 1.5),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 14)),
-          const SizedBox(width: 4),
-          Text(
-            ligue.toUpperCase(),
-            style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 10),
+          SizedBox(
+            width: 22,
+            height: 22,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 2.5,
+                  backgroundColor: color.withValues(alpha: 0.2),
+                  valueColor: AlwaysStoppedAnimation<Color>(color),
+                ),
+                Text(icon, style: const TextStyle(fontSize: 10)),
+              ],
+            ),
           ),
+          const SizedBox(width: 6),
+          Text(
+            '$xp XP',
+            style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 11),
+          ),
+          const SizedBox(width: 2),
         ],
       ),
     );

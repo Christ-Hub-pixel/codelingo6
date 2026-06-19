@@ -5,7 +5,6 @@ import '../exercice/ecran_pratique.dart';
 import '../boutique/ecran_boutique.dart';
 import '../classement/ecran_classement.dart';
 import '../profil/ecran_profil.dart';
-import '../../services/audio_service.dart';
 import '../../fournisseurs/progression_fournisseur.dart';
 import '../../utils/theme.dart';
 
@@ -59,7 +58,6 @@ class _EcranPrincipalState extends State<EcranPrincipal> {
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () {
-                    AudioService.jouerSonBouton();
                     setState(() => _currentIndex = index);
                   },
                   child: AnimatedContainer(

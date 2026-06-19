@@ -8,7 +8,9 @@ class HapticService {
   }
 
   static Future<void> error() async {
-    await HapticFeedback.vibrate();
+    await HapticFeedback.heavyImpact();
+    await Future.delayed(const Duration(milliseconds: 150));
+    await HapticFeedback.heavyImpact();
   }
 
   static Future<void> click() async {
