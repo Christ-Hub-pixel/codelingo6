@@ -36,12 +36,36 @@ class NotificationFournisseur with ChangeNotifier {
       _sauvegarderNotifications();
     }
     notifyListeners();
+    
+    // Vérifier s'il faut ajouter les notifications du jour
+    await verifierNotificationsQuotidiennes();
   }
 
   Future<void> _sauvegarderNotifications() async {
     final prefs = await SharedPreferences.getInstance();
     final String encoded = json.encode(_notifications.map((n) => n.toJson()).toList());
     await prefs.setString('notifications', encoded);
+  }
+
+  Future<void> verifierNotificationsQuotidiennes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? dernierCheck = prefs.getString('dernier_check_notif');
+    final String aujourdHui = DateTime.now().toIso8601String().split('T')[0];
+
+    if (dernierCheck != aujourdHui) {
+      // C'est un nouveau jour, on ajoute des notifications d'accueil
+      await ajouterNotification(
+        'Quête du jour 🎯',
+        'N\'oublie pas de terminer 2 leçons pour ton bonus de gemmes !',
+        'rappel',
+      );
+      await ajouterNotification(
+        'Prêt à coder ? 💻',
+        'Ton sentier d\'apprentissage t\'attend. Continue sur ta lancée !',
+        'info',
+      );
+      await prefs.setString('dernier_check_notif', aujourdHui);
+    }
   }
 
   Future<void> ajouterNotification(String titre, String message, String type) async {
